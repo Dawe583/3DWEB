@@ -1,4 +1,4 @@
-import { ArrowRight, Globe, Menu, X } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
@@ -12,20 +12,30 @@ import ScrollZoomSection from "../components/ScrollZoomSection";
 import ScrambleText from "../components/ScrambleText";
 import HeroParticles from "../components/HeroParticles";
 import ShowcaseSection from "../components/ShowcaseSection";
+import ProcessSection from "../components/ProcessSection";
+import ClientLogos from "../components/ClientLogos";
+import TestimonialsSection from "../components/TestimonialsSection";
+import SectionBridge from "../components/SectionBridge";
+import ScrollSpyDots from "../components/ScrollSpyDots";
 import { useMagnetic } from "../hooks/useMagnetic";
 
 const HERO_VIDEO =
-  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_074625_a81f018a-956b-43fb-9aee-4d1508e30e6a.mp4";
+  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260319_055001_8e16d972-3b2b-441c-86ad-2901a54682f9.mp4";
 
 const SHOWREEL_VIDEO =
-  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260402_054547_9875cfc5-155a-4229-8ec8-b7ba7125cbf8.mp4";
+  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260505_105838_084968f2-4415-42a4-971a-3bec54539549.mp4";
+
+const SERVICES_VIDEO =
+  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260411_104032_69319010-2458-492b-b04d-b40a5dfa4482.mp4";
 
 const PHILOSOPHY_VIDEO =
-  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260307_083826_e938b29f-a43a-41ec-a153-3d4730578ab8.mp4";
+  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260330_145725_08886141-ed95-4a8e-8d6d-b75eaadce638.mp4";
 
 const NAV_LINKS = [
   { label: "O nás", href: "#about" },
   { label: "Služby", href: "#services" },
+  { label: "Automatizace", href: "/automatizace" },
+  { label: "Marketing", href: "/marketing" },
   { label: "Šablony", href: "/weby" },
   { label: "Filosofie", href: "#philosophy" },
   { label: "Kontakt", href: "#contact" },
@@ -39,17 +49,18 @@ export default function Index() {
   const ctaMagnetic = useMagnetic(0.3);
   const scrollMagnetic = useMagnetic(0.4);
 
-  // Same zoom mechanics as ScrollZoomSection, mirrored — the hero video shrinks
-  // down into a small rounded box exactly where the next ScrollZoomSection
+  // Same zoom mechanics as ScrollZoomSection, mirrored — the hero video lives in
+  // a contained, rounded card (never full-bleed, so the stream stays sharp) and
+  // shrinks down into the small box exactly where the next ScrollZoomSection
   // picks it back up, so the whole page reads as one continuous zoom motion.
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   });
 
-  const rawHeroWidth = useTransform(heroProgress, [0, 1], ["100vw", "32vw"]);
-  const rawHeroHeight = useTransform(heroProgress, [0, 1], ["100vh", "16vh"]);
-  const rawHeroRadius = useTransform(heroProgress, [0, 1], [0, 32]);
+  const rawHeroWidth = useTransform(heroProgress, [0, 1], ["72vw", "32vw"]);
+  const rawHeroHeight = useTransform(heroProgress, [0, 1], ["78vh", "16vh"]);
+  const rawHeroRadius = useTransform(heroProgress, [0, 1], [24, 32]);
 
   const heroSpring = { stiffness: 90, damping: 25, mass: 0.6 };
   const heroWidth = useSpring(rawHeroWidth, heroSpring);
@@ -60,8 +71,16 @@ export default function Index() {
   const heroContentOpacity = useSpring(rawHeroContentOpacity, { stiffness: 120, damping: 20 });
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll);
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 60);
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -95,6 +114,7 @@ export default function Index() {
     // The browser may have already buffered/started playback before this
     // listener was attached (e.g. cached video) — catch that case too.
     if (video.readyState >= 3 || !video.paused) { video.play().catch(() => {}); reveal(); }
+
     return () => {
       video.removeEventListener("canplay", handleCanPlay);
       video.removeEventListener("playing", handlePlaying);
@@ -102,7 +122,8 @@ export default function Index() {
   }, []);
 
   return (
-    <main className="bg-black">
+    <main>
+      <ScrollSpyDots />
 
       {/* ── HERO ── */}
       <section ref={heroRef} style={{ height: "250vh", position: "relative" }} className="bg-black">
@@ -110,6 +131,23 @@ export default function Index() {
           style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}
           className="flex flex-col"
         >
+
+        {/* Soft glow halo behind the hero card so the black margins don't read as empty */}
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            width: "85vw",
+            height: "85vh",
+            transform: "translate(-50%, -50%)",
+            borderRadius: "9999px",
+            background:
+              "radial-gradient(ellipse at center, rgba(99,102,241,0.16) 0%, rgba(168,85,247,0.07) 40%, transparent 70%)",
+            filter: "blur(70px)",
+            pointerEvents: "none",
+          }}
+        />
 
         {/* Shrinking video — same width/height/radius spring used by every ScrollZoomSection */}
         <motion.div
@@ -123,18 +161,16 @@ export default function Index() {
             translateX: "-50%",
             translateY: "-50%",
             overflow: "hidden",
+            boxShadow: "0 40px 120px -20px rgba(0,0,0,0.8)",
           }}
         >
           <video
             ref={videoRef}
             style={{
-              position: "absolute",
-              left: "50%",
-              top: "50%",
-              width: "100vw",
-              height: "100vh",
+              width: "100%",
+              height: "100%",
               objectFit: "cover",
-              transform: "translate(-50%, -50%)",
+              display: "block",
             }}
             muted autoPlay loop playsInline preload="auto"
           >
@@ -154,19 +190,18 @@ export default function Index() {
           <div className={`max-w-5xl mx-auto liquid-glass rounded-full px-6 py-3 flex items-center justify-between transition-all duration-500 ${scrolled ? "bg-black/20" : ""}`}>
 
             <div className="flex items-center">
-              <Globe className="w-5 h-5 text-indigo-400" />
-              <span className="ml-2 font-semibold tracking-wide">SiteSpot</span>
+              <span className="font-semibold tracking-wide">SiteSpot</span>
 
               <div className="hidden md:flex gap-8 ml-10">
                 {NAV_LINKS.map(link => (
                   link.href.startsWith("/") ? (
-                    <Link key={link.label} to={link.href}
-                      className="text-white/70 hover:text-white text-sm transition-colors">
+                    <Link key={link.label} to={link.href} data-cursor-hover
+                      className="link-underline text-white/70 hover:text-white text-sm transition-colors">
                       {link.label}
                     </Link>
                   ) : (
-                    <a key={link.label} href={link.href}
-                      className="text-white/70 hover:text-white text-sm transition-colors">
+                    <a key={link.label} href={link.href} data-cursor-hover
+                      className="link-underline text-white/70 hover:text-white text-sm transition-colors">
                       {link.label}
                     </a>
                   )
@@ -179,7 +214,7 @@ export default function Index() {
                 className="hidden md:block liquid-glass rounded-full px-6 py-2 text-sm hover:bg-white/5 transition-colors">
                 Začít projekt
               </a>
-              <button className="md:hidden liquid-glass rounded-full p-2" onClick={() => setMenuOpen(!menuOpen)}>
+              <button className="md:hidden liquid-glass rounded-full p-3 min-w-11 min-h-11 flex items-center justify-center" onClick={() => setMenuOpen(!menuOpen)}>
                 {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
@@ -233,7 +268,7 @@ export default function Index() {
             className="instrument text-6xl md:text-8xl lg:text-9xl tracking-tight"
           >
             <ScrambleText text="Váš byznys," duration={1600} />{" "}
-            <em className="italic accent-gradient-text">
+            <em className="italic accent-shimmer">
               <ScrambleText text="online." duration={1600} />
             </em>
           </motion.h1>
@@ -242,7 +277,7 @@ export default function Index() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="mt-6 text-white/60 max-w-xl text-lg leading-relaxed"
+            className="mt-6 body-text max-w-xl text-lg"
           >
             Stavíme weby, AI automatizace a lead-gen systémy
             které pracují 24/7 — i když vy spíte.
@@ -274,11 +309,17 @@ export default function Index() {
           <motion.div
             ref={scrollMagnetic as React.RefObject<HTMLDivElement>}
             data-cursor-hover
-            animate={{ y: [0, 8, 0] }}
-            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-            className="liquid-glass rounded-full px-4 py-2 text-xs text-white/30 tracking-widest uppercase"
+            className="flex flex-col items-center gap-3"
           >
-            scroll
+            <span className="text-[10px] text-white/30 tracking-[0.3em] uppercase">scroll</span>
+            {/* Animated mouse: a dot drifting down inside a glass capsule */}
+            <div className="liquid-glass rounded-full w-6 h-10 flex justify-center pt-2">
+              <motion.span
+                animate={{ y: [0, 10, 0], opacity: [1, 0.2, 1] }}
+                transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                className="block w-1 h-1 rounded-full bg-indigo-300"
+              />
+            </div>
           </motion.div>
         </motion.div>
         </motion.div>
@@ -295,13 +336,16 @@ export default function Index() {
       />
 
       {/* ── ABOUT ── */}
-      <div id="about">
-        <AboutSection />
-      </div>
+      <AboutSection />
+
+      <SectionBridge />
+
+      {/* ── CLIENT TRUST BAR ── */}
+      <ClientLogos />
 
       {/* ── SCROLL ZOOM 2 — přechod do Services ── */}
       <ScrollZoomSection
-        mediaSrc={HERO_VIDEO}
+        mediaSrc={SERVICES_VIDEO}
         leftText="Naše"
         rightText="Služby"
         ctaText="Zobrazit služby"
@@ -309,12 +353,17 @@ export default function Index() {
       />
 
       {/* ── SERVICES ── */}
-      <div id="services">
-        <ServicesSection />
-      </div>
+      <ServicesSection />
+
+      <SectionBridge />
 
       {/* ── SHOWCASE / CASE STUDY ── */}
       <ShowcaseSection />
+
+      <SectionBridge />
+
+      {/* ── TESTIMONIALS ── */}
+      <TestimonialsSection />
 
       {/* ── SCROLL ZOOM 3 — přechod do Philosophy ── */}
       <ScrollZoomSection
@@ -326,9 +375,14 @@ export default function Index() {
       />
 
       {/* ── PHILOSOPHY ── */}
-      <div id="philosophy">
-        <PhilosophySection />
-      </div>
+      <PhilosophySection />
+
+      <SectionBridge />
+
+      {/* ── PROCESS ── */}
+      <ProcessSection />
+
+      <SectionBridge />
 
       {/* ── CONTACT ── */}
       <ContactSection />

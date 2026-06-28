@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, ArrowUpRight, Globe, Bot, Target } from "lucide-react";
+import { Link } from "react-router-dom";
+import { motion, useScroll, useTransform, useSpring, useMotionValueEvent } from "framer-motion";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Globe, Bot, Target, Megaphone } from "lucide-react";
 import ScrambleText from "./ScrambleText";
+import SectionHeading from "./SectionHeading";
 import { useMagnetic } from "../hooks/useMagnetic";
+import { useTilt } from "../hooks/useTilt";
 
 const services = [
   {
@@ -13,6 +16,7 @@ const services = [
       "Navrhujeme a stavíme weby na míru — od landing pages po komplexní platformy. Každý pixel slouží jednomu cíli: proměnit návštěvníka v zákazníka.",
     video:
       "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_131748_f2ca2a28-fed7-44c8-b9a9-bd9acdd5ec31.mp4",
+    href: "#contact",
   },
   {
     tag: "AI Automatizace",
@@ -22,6 +26,17 @@ const services = [
       "Zapojíme AI do vašeho workflows — od automatického zpracování dotazů přes personalizované e-maily až po inteligentní CRM integrace. Ušetříte hodiny denně.",
     video:
       "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260324_151826_c7218672-6e92-402c-9e45-f1e0f454bdc4.mp4",
+    href: "/automatizace",
+  },
+  {
+    tag: "Marketing & Růst",
+    icon: Megaphone,
+    title: "Zákazníci, kteří kupují",
+    description:
+      "Placené kampaně, obsah a SEO spojené do jednoho systému, který přivádí kvalifikované zákazníky — měřitelně a opakovaně.",
+    video:
+      "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260319_055001_8e16d972-3b2b-441c-86ad-2901a54682f9.mp4",
+    href: "/marketing",
   },
   {
     tag: "Lead Generation",
@@ -31,28 +46,25 @@ const services = [
       "Systémy pro cílené získávání kvalifikovaných kontaktů. Kombinujeme SEO, placené kampaně a AI scoring tak, aby k vám přicházeli lidé připravení nakoupit.",
     video:
       "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_074625_a81f018a-956b-43fb-9aee-4d1508e30e6a.mp4",
+    href: "#contact",
   },
 ];
 
 function ServiceCard({
   service,
   active,
-  registerRef,
 }: {
   service: (typeof services)[number];
   active: boolean;
-  registerRef: (el: HTMLDivElement | null) => void;
 }) {
   const Icon = service.icon;
   const magnetic = useMagnetic(0.2);
+  const tilt = useTilt(5);
 
   return (
-    <div
-      ref={registerRef}
-      className="snap-center shrink-0 w-[85vw] md:w-[60vw] lg:w-[50vw]"
-    >
+    <div ref={tilt} className="shrink-0 w-[85vw] md:w-[60vw] lg:w-[50vw]">
       <motion.div
-        animate={{ opacity: active ? 1 : 0.45, scale: active ? 1 : 0.94 }}
+        animate={{ opacity: active ? 1 : 0.4, scale: active ? 1 : 0.92 }}
         transition={{ duration: 0.4 }}
         className="liquid-glass overflow-hidden rounded-3xl md:grid md:grid-cols-2"
       >
@@ -80,16 +92,27 @@ function ServiceCard({
             <h3 className="text-2xl md:text-3xl tracking-tight text-white mb-4">
               {service.title}
             </h3>
-            <p className="text-white/50 leading-relaxed">{service.description}</p>
+            <p className="body-text">{service.description}</p>
           </div>
-          <a
-            ref={magnetic as React.RefObject<HTMLAnchorElement>}
-            href="#contact"
-            data-cursor-hover
-            className="mt-8 liquid-glass rounded-full px-6 py-3 text-sm w-fit flex items-center gap-2 hover:bg-white/5 transition-colors"
-          >
-            Zjistit více <ArrowUpRight className="w-4 h-4" />
-          </a>
+          {service.href.startsWith("/") ? (
+            <Link
+              ref={magnetic as React.RefObject<HTMLAnchorElement>}
+              to={service.href}
+              data-cursor-hover
+              className="mt-8 liquid-glass rounded-full px-6 py-3 text-sm w-fit flex items-center gap-2 hover:bg-white/5 transition-colors"
+            >
+              Zjistit více <ArrowUpRight className="w-4 h-4" />
+            </Link>
+          ) : (
+            <a
+              ref={magnetic as React.RefObject<HTMLAnchorElement>}
+              href={service.href}
+              data-cursor-hover
+              className="mt-8 liquid-glass rounded-full px-6 py-3 text-sm w-fit flex items-center gap-2 hover:bg-white/5 transition-colors"
+            >
+              Zjistit více <ArrowUpRight className="w-4 h-4" />
+            </a>
+          )}
         </div>
       </motion.div>
     </div>
@@ -97,140 +120,128 @@ function ServiceCard({
 }
 
 export default function ServicesSection() {
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const sectionRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const ctaMagnetic = useMagnetic(0.3);
   const prevMagnetic = useMagnetic(0.3);
   const nextMagnetic = useMagnetic(0.3);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [maxScroll, setMaxScroll] = useState(0);
 
+  // The section is pinned while you scroll past it and the cards translate
+  // horizontally in lock-step — so plain vertical scrolling walks through every
+  // service, no arrow clicking required.
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Measure how far the track must travel (full width minus one viewport).
   useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
-            const idx = cardRefs.current.indexOf(entry.target as HTMLDivElement);
-            if (idx !== -1) setActiveIndex(idx);
-          }
-        });
-      },
-      { root: scroller, threshold: [0.6] }
-    );
-
-    cardRefs.current.forEach((el) => el && observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
-  // Let vertical wheel input drive the horizontal carousel while hovering it.
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-      const atStart = scroller.scrollLeft <= 0;
-      const atEnd = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 1;
-      if ((atStart && e.deltaY < 0) || (atEnd && e.deltaY > 0)) return;
-      e.preventDefault();
-      scroller.scrollLeft += e.deltaY;
+    const measure = () => {
+      const track = trackRef.current;
+      if (!track) return;
+      setMaxScroll(Math.max(0, track.scrollWidth - track.clientWidth));
     };
-    scroller.addEventListener("wheel", onWheel, { passive: false });
-    return () => scroller.removeEventListener("wheel", onWheel);
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
   }, []);
 
+  const rawX = useTransform(scrollYProgress, [0, 1], [0, -maxScroll]);
+  const x = useSpring(rawX, { stiffness: 120, damping: 30, mass: 0.5 });
+
+  useMotionValueEvent(scrollYProgress, "change", (p) => {
+    setActiveIndex(Math.round(p * (services.length - 1)));
+  });
+
+  // Arrow / dot navigation drives the page scroll to the matching pin offset.
   const scrollToIndex = (i: number) => {
-    const card = cardRefs.current[i];
-    card?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    const section = sectionRef.current;
+    if (!section) return;
+    const travel = section.offsetHeight - window.innerHeight;
+    const target = section.offsetTop + (i / (services.length - 1)) * travel;
+    window.scrollTo({ top: target, behavior: "smooth" });
   };
 
   return (
-    <section id="services" className="relative overflow-hidden bg-black py-28 md:py-40">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(99,102,241,0.04)_0%,_transparent_60%)] pointer-events-none" />
+    <section
+      id="services"
+      ref={sectionRef}
+      className="relative"
+      style={{ height: `${services.length * 100}vh` }}
+    >
+      <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
 
-      <div className="relative max-w-6xl mx-auto px-6 pb-16">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.7 }}
-          className="flex items-end justify-between"
-        >
-          <div>
-            <p className="uppercase tracking-[0.25em] text-sm text-white/40 mb-4">
-              Služby
-            </p>
-            <h2 className="text-4xl md:text-6xl tracking-tight text-white">
+        {/* Header */}
+        <div className="relative max-w-6xl mx-auto w-full px-6 pb-10 md:pb-14">
+          <div className="flex items-end justify-between">
+            <SectionHeading eyebrow="Služby">
               <ScrambleText text="Co pro vás" />{" "}
               <span className="instrument italic text-white/40">
                 <ScrambleText text="děláme" />
               </span>
-            </h2>
-          </div>
-          <a
-            ref={ctaMagnetic as React.RefObject<HTMLAnchorElement>}
-            href="#contact"
-            data-cursor-hover
-            className="hidden md:flex liquid-glass rounded-full px-6 py-3 text-sm items-center gap-2 hover:bg-white/5 transition-colors"
-          >
-            Začít projekt <ArrowUpRight className="w-4 h-4" />
-          </a>
-        </motion.div>
-      </div>
-
-      {/* Native horizontal scroller — every card is always reachable by scroll, drag or arrows */}
-      <div
-        ref={scrollerRef}
-        className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-4 px-[7.5vw] md:px-[20vw] lg:px-[25vw] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {services.map((service, i) => (
-          <ServiceCard
-            key={service.title}
-            service={service}
-            active={activeIndex === i}
-            registerRef={(el) => (cardRefs.current[i] = el)}
-          />
-        ))}
-      </div>
-
-      {/* Controls */}
-      <div className="relative max-w-6xl mx-auto px-6 mt-10 flex items-center justify-center gap-6">
-        <button
-          ref={prevMagnetic as React.RefObject<HTMLButtonElement>}
-          data-cursor-hover
-          onClick={() => scrollToIndex(Math.max(0, activeIndex - 1))}
-          disabled={activeIndex === 0}
-          className="liquid-glass rounded-full p-3 disabled:opacity-30 hover:bg-white/5 transition-colors"
-          aria-label="Předchozí služba"
-        >
-          <ArrowLeft className="w-4 h-4 text-white" />
-        </button>
-
-        <div className="flex items-center gap-2">
-          {services.map((service, i) => (
-            <button
-              key={service.title}
-              onClick={() => scrollToIndex(i)}
+            </SectionHeading>
+            <a
+              ref={ctaMagnetic as React.RefObject<HTMLAnchorElement>}
+              href="#contact"
               data-cursor-hover
-              aria-label={`Zobrazit ${service.title}`}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                activeIndex === i ? "w-8 bg-indigo-400" : "w-1.5 bg-white/20 hover:bg-white/40"
-              }`}
-            />
-          ))}
+              className="hidden md:flex liquid-glass rounded-full px-6 py-3 text-sm items-center gap-2 hover:bg-white/5 transition-colors"
+            >
+              Začít projekt <ArrowUpRight className="w-4 h-4" />
+            </a>
+          </div>
         </div>
 
-        <button
-          ref={nextMagnetic as React.RefObject<HTMLButtonElement>}
-          data-cursor-hover
-          onClick={() => scrollToIndex(Math.min(services.length - 1, activeIndex + 1))}
-          disabled={activeIndex === services.length - 1}
-          className="liquid-glass rounded-full p-3 disabled:opacity-30 hover:bg-white/5 transition-colors"
-          aria-label="Další služba"
+        {/* Horizontal track driven by scroll */}
+        <motion.div
+          ref={trackRef}
+          style={{ x }}
+          className="flex gap-6 px-[7.5vw] md:px-[20vw] lg:px-[25vw]"
         >
-          <ArrowRight className="w-4 h-4 text-white" />
-        </button>
+          {services.map((service, i) => (
+            <ServiceCard key={service.title} service={service} active={activeIndex === i} />
+          ))}
+        </motion.div>
+
+        {/* Controls */}
+        <div className="relative max-w-6xl mx-auto w-full px-6 mt-10 flex items-center justify-center gap-6">
+          <button
+            ref={prevMagnetic as React.RefObject<HTMLButtonElement>}
+            data-cursor-hover
+            onClick={() => scrollToIndex(Math.max(0, activeIndex - 1))}
+            disabled={activeIndex === 0}
+            className="liquid-glass rounded-full p-3 disabled:opacity-30 hover:bg-white/5 transition-colors"
+            aria-label="Předchozí služba"
+          >
+            <ArrowLeft className="w-4 h-4 text-white" />
+          </button>
+
+          <div className="flex items-center gap-2">
+            {services.map((service, i) => (
+              <button
+                key={service.title}
+                onClick={() => scrollToIndex(i)}
+                data-cursor-hover
+                aria-label={`Zobrazit ${service.title}`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  activeIndex === i ? "w-8 bg-indigo-400" : "w-1.5 bg-white/20 hover:bg-white/40"
+                }`}
+              />
+            ))}
+          </div>
+
+          <button
+            ref={nextMagnetic as React.RefObject<HTMLButtonElement>}
+            data-cursor-hover
+            onClick={() => scrollToIndex(Math.min(services.length - 1, activeIndex + 1))}
+            disabled={activeIndex === services.length - 1}
+            className="liquid-glass rounded-full p-3 disabled:opacity-30 hover:bg-white/5 transition-colors"
+            aria-label="Další služba"
+          >
+            <ArrowRight className="w-4 h-4 text-white" />
+          </button>
+        </div>
       </div>
     </section>
   );

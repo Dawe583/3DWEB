@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
-import { useReveal, useParallax } from "../hooks/useReveal";
+import { useReveal } from "../hooks/useReveal";
 
 const VIDEO =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260402_054547_9875cfc5-155a-4229-8ec8-b7ba7125cbf8.mp4";
@@ -18,7 +18,7 @@ export default function FeaturedVideoSection() {
         <div className="reveal-scale overflow-hidden rounded-3xl aspect-video relative">
           <video
             className="w-full h-full object-cover"
-            muted autoPlay loop playsInline preload="auto"
+            muted autoPlay loop playsInline preload="metadata"
           >
             <source src={VIDEO} />
           </video>

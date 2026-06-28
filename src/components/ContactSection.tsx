@@ -3,6 +3,8 @@ import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useMagnetic } from "../hooks/useMagnetic";
 import ScrambleText from "./ScrambleText";
+import SectionHeading from "./SectionHeading";
+import SpotlightCard from "./SpotlightCard";
 
 export default function ContactSection() {
   const [sent, setSent] = useState(false);
@@ -16,45 +18,21 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="relative overflow-hidden bg-black py-28 md:py-40 px-6">
-
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_rgba(99,102,241,0.08)_0%,_transparent_60%)] pointer-events-none" />
+    <section id="contact" className="relative overflow-hidden py-28 md:py-40 px-6">
 
       <div className="relative max-w-3xl mx-auto text-center">
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="uppercase tracking-[0.25em] text-sm text-white/40 mb-6"
-        >
-          Kontakt
-        </motion.p>
-
-        <motion.h2
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-5xl md:text-7xl tracking-tight text-white mb-6"
+        <SectionHeading
+          eyebrow="Kontakt"
+          align="center"
+          className="mb-12"
+          subtitle="Pošlete nám email nebo nám nechte kontakt — ozveme se do 24 hodin s konkrétním návrhem pro váš byznys."
         >
           <ScrambleText text="Začněme" />{" "}
           <span className="instrument italic accent-gradient-text">
             <ScrambleText text="společně" />
           </span>
-        </motion.h2>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="text-white/50 text-lg leading-relaxed mb-12"
-        >
-          Pošlete nám email nebo nám nechte kontakt — ozveme se do 24 hodin
-          s konkrétním návrhem pro váš byznys.
-        </motion.p>
+        </SectionHeading>
 
         {!sent ? (
           <motion.div
@@ -62,34 +40,36 @@ export default function ContactSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.3 }}
-            className="flex flex-col gap-4 max-w-lg mx-auto"
+            className="max-w-lg mx-auto"
           >
-            <div className="liquid-glass rounded-2xl px-6 py-4">
-              <input
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="Vaše jméno"
-                className="w-full bg-transparent outline-none placeholder:text-white/30 text-white"
-              />
-            </div>
-            <div className="liquid-glass rounded-2xl px-6 py-4">
-              <input
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                type="email"
-                placeholder="Váš email"
-                className="w-full bg-transparent outline-none placeholder:text-white/30 text-white"
-              />
-            </div>
-            <motion.button
-              ref={submitMagnetic as React.RefObject<HTMLButtonElement>}
-              data-cursor-hover
-              whileTap={{ scale: 0.98 }}
-              onClick={handleSubmit}
-              className="liquid-glass rounded-2xl px-8 py-4 text-sm font-medium flex items-center justify-center gap-3 hover:bg-white/5 transition-colors"
-            >
-              Odeslat <ArrowRight className="w-4 h-4" />
-            </motion.button>
+            <SpotlightCard className="liquid-glass rounded-3xl p-6 md:p-8 flex flex-col gap-4">
+              <div className="liquid-glass rounded-2xl px-6 py-4">
+                <input
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Vaše jméno"
+                  className="w-full bg-transparent outline-none placeholder:text-white/30 text-white"
+                />
+              </div>
+              <div className="liquid-glass rounded-2xl px-6 py-4">
+                <input
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  type="email"
+                  placeholder="Váš email"
+                  className="w-full bg-transparent outline-none placeholder:text-white/30 text-white"
+                />
+              </div>
+              <motion.button
+                ref={submitMagnetic as React.RefObject<HTMLButtonElement>}
+                data-cursor-hover
+                whileTap={{ scale: 0.98 }}
+                onClick={handleSubmit}
+                className="liquid-glass rounded-2xl px-8 py-4 text-sm font-medium flex items-center justify-center gap-3 hover:bg-white/5 transition-colors"
+              >
+                Odeslat <ArrowRight className="w-4 h-4" />
+              </motion.button>
+            </SpotlightCard>
           </motion.div>
         ) : (
           <motion.div
@@ -99,7 +79,7 @@ export default function ContactSection() {
             className="liquid-glass rounded-3xl p-10 max-w-lg mx-auto"
           >
             <p className="text-2xl text-white mb-3">✓ Odesláno</p>
-            <p className="text-white/50">
+            <p className="text-white/70">
               Díky, {name || "příteli"}! Ozveme se do 24 hodin.
             </p>
           </motion.div>

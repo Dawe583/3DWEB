@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useReveal, useParallax } from "../hooks/useReveal";
 import { useMagnetic } from "../hooks/useMagnetic";
 import ScrambleText from "./ScrambleText";
+import SectionHeading from "./SectionHeading";
 
 const VIDEO =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260307_083826_e938b29f-a43a-41ec-a153-3d4730578ab8.mp4";
@@ -30,23 +31,22 @@ export default function PhilosophySection() {
     <section
       id="philosophy"
       ref={sectionRef as React.RefObject<HTMLDivElement>}
-      className="bg-black py-28 md:py-40 px-6 overflow-hidden"
+      className="py-28 md:py-40 px-6 overflow-hidden"
     >
       <div className="section-glow-line max-w-6xl mx-auto mb-20" />
       <div className="max-w-6xl mx-auto">
 
-        <div className="reveal mb-16 md:mb-24">
-          <p className="uppercase tracking-[0.25em] text-sm text-white/40 mb-6">
-            Filosofie
-          </p>
-          <h2 className="text-5xl md:text-7xl lg:text-8xl tracking-tight text-white">
-            <ScrambleText text="Technologie" />{" "}
-            <span className="instrument italic text-white/30">×</span>{" "}
-            <span className="accent-gradient-text">
-              <ScrambleText text="Výsledky" />
-            </span>
-          </h2>
-        </div>
+        <SectionHeading
+          eyebrow="Filosofie"
+          titleClassName="text-5xl md:text-7xl lg:text-8xl tracking-tight text-white"
+          className="mb-16 md:mb-24"
+        >
+          <ScrambleText text="Technologie" />{" "}
+          <span className="instrument italic text-white/30">×</span>{" "}
+          <span className="accent-gradient-text">
+            <ScrambleText text="Výsledky" />
+          </span>
+        </SectionHeading>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-start">
 
@@ -79,7 +79,7 @@ export default function PhilosophySection() {
                     <h3 className="text-2xl md:text-3xl font-light text-white mb-3 group-hover:text-indigo-300 transition-colors duration-500">
                       {pillar.label}
                     </h3>
-                    <p className="text-white/50 leading-relaxed">
+                    <p className="body-text">
                       {pillar.text}
                     </p>
                   </div>

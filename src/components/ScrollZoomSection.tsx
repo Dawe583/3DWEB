@@ -29,12 +29,14 @@ export default function ScrollZoomSection({
     offset: ["start start", "end end"],
   });
 
-  // Width: 32vw → 100vw
-  const rawWidth = useTransform(scrollYProgress, [0, 1], ["32vw", "100vw"]);
-  // Height: 16vh → 100vh
-  const rawHeight = useTransform(scrollYProgress, [0, 1], ["16vh", "100vh"]);
-  // Border radius: 32px → 0px
-  const rawRadius = useTransform(scrollYProgress, [0, 1], [32, 0]);
+  // The media grows into a CONTAINED card — never full-bleed. Capping the final
+  // size keeps each (relatively low-res) source video sharp: the fewer screen
+  // pixels we stretch it across, the less upscaling blur is visible.
+  const rawWidth = useTransform(scrollYProgress, [0, 1], ["32vw", "72vw"]);
+  const rawHeight = useTransform(scrollYProgress, [0, 1], ["16vh", "78vh"]);
+  // Stays a rounded card the whole time — reinforces that it's a framed panel,
+  // not a full-screen background.
+  const rawRadius = useTransform(scrollYProgress, [0, 1], [28, 24]);
 
   const springConfig = { stiffness: 90, damping: 25, mass: 0.6 };
 
@@ -47,9 +49,9 @@ export default function ScrollZoomSection({
   const sideX_left = useTransform(scrollYProgress, [0, 0.4], [0, -40]);
   const sideX_right = useTransform(scrollYProgress, [0, 0.4], [0, 40]);
 
-  // CTA fades in when fully expanded
-  const ctaOpacity = useTransform(scrollYProgress, [0.45, 0.65], [0, 1]);
-  const ctaY = useTransform(scrollYProgress, [0.45, 0.65], [30, 0]);
+  // Foreground title + CTA fade in over the video once it's expanded
+  const overlayOpacity = useTransform(scrollYProgress, [0.4, 0.62], [0, 1]);
+  const overlayY = useTransform(scrollYProgress, [0.4, 0.62], [30, 0]);
 
   return (
     <section
@@ -69,6 +71,23 @@ export default function ScrollZoomSection({
           background: "black",
         }}
       >
+        {/* Soft glow halo behind the card so the black margins don't read as empty */}
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            width: "80vw",
+            height: "80vh",
+            transform: "translate(-50%, -50%)",
+            borderRadius: "9999px",
+            background:
+              "radial-gradient(ellipse at center, rgba(99,102,241,0.14) 0%, rgba(168,85,247,0.06) 40%, transparent 70%)",
+            filter: "blur(60px)",
+            pointerEvents: "none",
+          }}
+        />
+
         {/* LEFT TEXT */}
         {leftText && (
           <motion.div
@@ -90,7 +109,7 @@ export default function ScrollZoomSection({
           </motion.div>
         )}
 
-        {/* EXPANDING MEDIA */}
+        {/* EXPANDING MEDIA — contained card */}
         <motion.div
           style={{
             width,
@@ -99,24 +118,22 @@ export default function ScrollZoomSection({
             overflow: "hidden",
             position: "relative",
             flexShrink: 0,
+            boxShadow: "0 40px 120px -20px rgba(0,0,0,0.8)",
           }}
         >
           {mediaType === "video" ? (
             <video
               style={{
-                position: "absolute",
-                left: "50%",
-                top: "50%",
-                width: "100vw",
-                height: "100vh",
+                width: "100%",
+                height: "100%",
                 objectFit: "cover",
-                transform: "translate(-50%, -50%)",
+                display: "block",
               }}
               muted
               autoPlay
               loop
               playsInline
-              preload="auto"
+              preload="metadata"
             >
               <source src={mediaSrc} />
             </video>
@@ -125,46 +142,64 @@ export default function ScrollZoomSection({
               src={mediaSrc}
               alt=""
               style={{
-                position: "absolute",
-                left: "50%",
-                top: "50%",
-                width: "100vw",
-                height: "100vh",
+                width: "100%",
+                height: "100%",
                 objectFit: "cover",
-                transform: "translate(-50%, -50%)",
+                display: "block",
               }}
             />
           )}
 
-          {/* Dark overlay */}
+          {/* Dark gradient for text legibility */}
           <div
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%)",
+                "linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.15) 45%, transparent 75%)",
+              pointerEvents: "none",
             }}
           />
 
-          {/* CTA / overlay content */}
-          {(ctaText || overlay) && (
+          {/* FOREGROUND TITLE + CTA — sits in front of the video */}
+          {(leftText || rightText || ctaText || overlay) && (
             <motion.div
               style={{
                 position: "absolute",
-                top: "50%",
-                left: "50%",
-                translateX: "-50%",
-                translateY: "-50%",
-                opacity: ctaOpacity,
-                y: ctaY,
+                inset: 0,
+                opacity: overlayOpacity,
+                y: overlayY,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: "16px",
+                justifyContent: "center",
+                gap: "24px",
+                textAlign: "center",
+                padding: "0 6vw",
                 pointerEvents: "none",
               }}
             >
+              {(leftText || rightText) && (
+                <h2
+                  className="instrument"
+                  style={{
+                    color: "white",
+                    fontSize: "clamp(40px, 6vw, 96px)",
+                    fontWeight: 300,
+                    letterSpacing: "-0.03em",
+                    lineHeight: 1.05,
+                    margin: 0,
+                  }}
+                >
+                  {leftText}{" "}
+                  {rightText && (
+                    <em className="italic accent-gradient-text">{rightText}</em>
+                  )}
+                </h2>
+              )}
+
               {overlay}
+
               {ctaText && (
                 <a
                   href={ctaHref}

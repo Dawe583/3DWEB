@@ -1,13 +1,35 @@
 @import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap");
 
 @import "tailwindcss";
+
+/* ── Design tokens — single source of truth for accent + glow ── */
+:root {
+  --accent-1: #818cf8;          /* indigo  */
+  --accent-2: #c084fc;          /* purple  */
+  --accent-1-rgb: 99, 102, 241;
+  --accent-2-rgb: 168, 85, 247;
+
+  --glow-soft: rgba(var(--accent-1-rgb), 0.12);
+  --glow-line: rgba(var(--accent-1-rgb), 0.4);
+
+  /* Body text tone — keep one value so paragraphs don't drift */
+  --text-muted: rgba(255, 255, 255, 0.55);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
 
 html {
   scroll-behavior: auto;
 }
 
+/* Native cursor is hidden only once CursorFollower confirms it's actually
+   running (see html.custom-cursor toggle) — otherwise the pointer would
+   vanish entirely (e.g. under prefers-reduced-motion). */
 @media (pointer: fine) {
-  body, a, button {
+  html.custom-cursor body,
+  html.custom-cursor a,
+  html.custom-cursor button {
     cursor: none;
   }
 }
@@ -30,32 +52,112 @@ body {
   font-family: "Instrument Serif", serif;
 }
 
+/* ── Accent text selection ── */
+::selection {
+  background: rgba(var(--accent-1-rgb), 0.35);
+  color: #fff;
+}
+
+/* ── Thin accent scrollbar ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--accent-1-rgb), 0.5) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--accent-1), var(--accent-2));
+  border-radius: 9999px;
+}
+
+/* ── Keyboard focus ── */
+:focus-visible {
+  outline: 2px solid var(--accent-1);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Respect reduced-motion: kill parallax / drift / reveal transforms ──
+   .allow-motion is exempted: calm, linear, non-flashing marquee scrolls are
+   not the kind of motion this preference targets, and freezing them just
+   reads as broken rather than calm. */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.allow-motion),
+  *:not(.allow-motion)::before,
+  *:not(.allow-motion)::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 @layer components {
 
   .liquid-glass {
-    background: rgba(255,255,255,.01);
-    background-blend-mode: luminosity;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    box-shadow: inset 0 1px 1px rgba(255,255,255,.1);
+    /* Frosted glass body: a clearly visible tinted fill over a strong, saturated
+       blur — denser than a hint so the panel reads as a solid pane of glass. */
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255,255,255,.16) 0%,
+        rgba(255,255,255,.07) 45%,
+        rgba(255,255,255,.12) 100%
+      );
+    backdrop-filter: blur(18px) saturate(190%) brightness(1.08);
+    -webkit-backdrop-filter: blur(18px) saturate(190%) brightness(1.08);
+    /* A real, visible hairline border around the whole panel. */
+    border: 1px solid rgba(255,255,255,.22);
+    /* Layered depth: stronger drop shadow + bright inner top sheen + bottom shade
+       give the glass real thickness and pop it off the background. */
+    box-shadow:
+      0 12px 40px -8px rgba(0,0,0,.65),
+      0 4px 12px -2px rgba(0,0,0,.5),
+      inset 0 1px 1px rgba(255,255,255,.6),
+      inset 0 -1px 1px rgba(255,255,255,.12),
+      inset 0 0 30px rgba(255,255,255,.06);
     position: relative;
     overflow: hidden;
+    isolation: isolate;
+    transition:
+      box-shadow .5s cubic-bezier(0.16, 1, 0.3, 1),
+      background .5s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color .5s cubic-bezier(0.16, 1, 0.3, 1),
+      transform .5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  /* Bold specular border — bright at the top-left "lit" edge, fading round to the
+     bottom-right, layered on top of the base border so the rim really glints. */
   .liquid-glass::before {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    padding: 1.4px;
+    padding: 1.5px;
     background: linear-gradient(
-      180deg,
-      rgba(255,255,255,.45) 0%,
-      rgba(255,255,255,.15) 20%,
-      rgba(255,255,255,0) 40%,
-      rgba(255,255,255,0) 60%,
-      rgba(255,255,255,.15) 80%,
-      rgba(255,255,255,.45) 100%
+      135deg,
+      rgba(255,255,255,.95) 0%,
+      rgba(255,255,255,.45) 18%,
+      rgba(255,255,255,.1) 38%,
+      rgba(255,255,255,.04) 52%,
+      rgba(255,255,255,.15) 70%,
+      rgba(255,255,255,.5) 90%,
+      rgba(255,255,255,.85) 100%
     );
     -webkit-mask:
       linear-gradient(#fff 0 0) content-box,
@@ -63,13 +165,87 @@ body {
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Glossy highlight sweeping across the top — the "wet" sheen that sells the
+     glass as a curved, reflective surface. */
+  .liquid-glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background:
+      radial-gradient(
+        120% 85% at 15% -10%,
+        rgba(255,255,255,.4) 0%,
+        rgba(255,255,255,.12) 32%,
+        rgba(255,255,255,0) 58%
+      );
+    pointer-events: none;
+    z-index: -1;
+    opacity: 1;
+    transition: opacity .5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Lift + warmer indigo rim on interaction. */
+  .liquid-glass:hover {
+    border-color: rgba(255,255,255,.35);
+    box-shadow:
+      0 18px 52px -10px rgba(0,0,0,.7),
+      0 5px 14px -2px rgba(0,0,0,.55),
+      inset 0 1px 1px rgba(255,255,255,.7),
+      inset 0 -1px 1px rgba(255,255,255,.15),
+      inset 0 0 40px rgba(129,140,248,.12);
   }
 
   .accent-gradient-text {
-    background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+    background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  /* Animated shimmer variant — slow light sweep across the gradient */
+  .accent-shimmer {
+    background: linear-gradient(
+      110deg,
+      var(--accent-1) 0%,
+      #ffffff 25%,
+      var(--accent-2) 50%,
+      var(--accent-1) 75%,
+      var(--accent-2) 100%
+    );
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: accent-shimmer 6s linear infinite;
+  }
+
+  @keyframes accent-shimmer {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 250% 50%; }
+  }
+
+  /* ── Typography scale — one consistent set of section primitives ── */
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .h-section {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: #fff;
+  }
+
+  .body-text {
+    color: var(--text-muted);
+    line-height: 1.7;
   }
 
   /* ── Scroll reveal ── */
@@ -139,11 +315,124 @@ body {
   /* Section divider glow line */
   .section-glow-line {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(99,102,241,0.4), transparent);
+    background: linear-gradient(90deg, transparent, var(--glow-line), transparent);
+  }
+
+  /* Animated underline for inline links (slides in from left on hover) */
+  .link-underline {
+    position: relative;
+  }
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s var(--ease-out-expo);
+  }
+  .link-underline:hover::after {
+    transform: scaleX(1);
   }
 
   /* Parallax wrapper */
   .parallax-slow {
     will-change: transform;
   }
+
+  /* Word-by-word reveal — each word is clipped inside a mask and slides up
+     into place with a short per-word stagger (set inline via JS). */
+  .word-mask {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+  }
+  .word-mask > span {
+    display: inline-block;
+    transform: translateY(115%);
+    transition: transform 0.7s var(--ease-out-expo);
+    will-change: transform;
+  }
+  .word-reveal-group.visible .word-mask > span {
+    transform: translateY(0);
+  }
+
+  /* One-shot glitch flicker on mount — RGB-split slices that snap back into
+     place. Runs once (no infinite loop) so it reads as an entrance, not noise. */
+  .glitch-in {
+    position: relative;
+    animation: glitch-settle 0.6s steps(2, end) 1;
+  }
+  .glitch-in::before,
+  .glitch-in::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .glitch-in::before,
+    .glitch-in::after {
+      animation: glitch-slice 0.5s steps(2, end) 1;
+    }
+    .glitch-in::before {
+      color: var(--accent-1);
+      animation-delay: 0.02s;
+    }
+    .glitch-in::after {
+      color: var(--accent-2);
+      animation-delay: 0.04s;
+    }
+  }
+  @keyframes glitch-settle {
+    0%   { transform: translateX(-4px); opacity: 0.4; }
+    40%  { transform: translateX(3px); }
+    100% { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes glitch-slice {
+    0%   { opacity: 0.7; clip-path: inset(10% 0 70% 0); transform: translateX(-3px); }
+    50%  { opacity: 0.5; clip-path: inset(60% 0 10% 0); transform: translateX(3px); }
+    100% { opacity: 0; clip-path: inset(0 0 100% 0); transform: translateX(0); }
+  }
+
+  /* Spotlight card — radial glow tracks the cursor via --spot-x/--spot-y,
+     set on mousemove in JS (see SpotlightCard.tsx). */
+  .spotlight-card {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .spotlight-card-glow {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0;
+    background: radial-gradient(
+      280px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+      rgba(129, 140, 248, 0.18),
+      transparent 70%
+    );
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  .spotlight-card:hover .spotlight-card-glow {
+    opacity: 1;
+  }
+
+  /* Custom cursor ring — pressed state gives tactile click feedback */
+  .cursor-ring {
+    transition: opacity 0.2s ease;
+  }
+  .cursor-ring.cursor-pressed {
+    background: rgba(255, 255, 255, 0.15);
+  }
+}
+
+/* Marquee for the client logo bar (list is duplicated, so -50% loops seamlessly) */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
