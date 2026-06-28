@@ -9,6 +9,9 @@ const TemplateDetail = lazy(() => import("./pages/template-detail"));
 const Automatizace = lazy(() => import("./pages/automatizace"));
 const Marketing = lazy(() => import("./pages/marketing"));
 import AmbientBackground from "./components/AmbientBackground";
+// The 3D layer pulls in three.js (~1 MB) — split it into its own chunk so the
+// initial page paints fast and the crystals stream in a beat later.
+const Scene3DBackground = lazy(() => import("./components/Scene3DBackground"));
 import SmoothScroll from "./components/SmoothScroll";
 import CursorFollower from "./components/CursorFollower";
 import NoiseOverlay from "./components/NoiseOverlay";
@@ -59,6 +62,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AmbientBackground />
+      <Suspense fallback={null}>
+        <Scene3DBackground />
+      </Suspense>
       <LoadingScreen />
       <SmoothScroll />
       <VideoManager />

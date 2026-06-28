@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { useMagnetic } from "../hooks/useMagnetic";
 
 interface ScrollZoomSectionProps {
   /** video or image src */
@@ -23,6 +24,7 @@ export default function ScrollZoomSection({
   overlay,
 }: ScrollZoomSectionProps) {
   const ref = useRef<HTMLElement>(null);
+  const ctaMagnetic = useMagnetic(0.35);
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -202,7 +204,9 @@ export default function ScrollZoomSection({
 
               {ctaText && (
                 <a
+                  ref={ctaMagnetic as React.RefObject<HTMLAnchorElement>}
                   href={ctaHref}
+                  data-cursor-hover
                   style={{ pointerEvents: "auto" }}
                   className="liquid-glass rounded-full px-10 py-4 text-white text-lg font-light tracking-wide hover:bg-white/10 transition-colors flex items-center gap-3"
                 >

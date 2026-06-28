@@ -15,7 +15,6 @@ import ShowcaseSection from "../components/ShowcaseSection";
 import ProcessSection from "../components/ProcessSection";
 import ClientLogos from "../components/ClientLogos";
 import TestimonialsSection from "../components/TestimonialsSection";
-import SectionBridge from "../components/SectionBridge";
 import ScrollSpyDots from "../components/ScrollSpyDots";
 import { useMagnetic } from "../hooks/useMagnetic";
 
@@ -126,7 +125,7 @@ export default function Index() {
       <ScrollSpyDots />
 
       {/* ── HERO ── */}
-      <section ref={heroRef} style={{ height: "250vh", position: "relative" }} className="bg-black">
+      <section ref={heroRef} style={{ height: "250vh", position: "relative" }}>
         <div
           style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}
           className="flex flex-col"
@@ -326,7 +325,13 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ── SCROLL ZOOM 1 — přechod do About ── */}
+      {/* Every major section is now introduced by the SAME signature transition —
+          a ScrollZoomSection whose video card grows in as you scroll — so the
+          whole page reads with one consistent rhythm instead of a mix of zooms,
+          light bridges and hard cuts. Videos cycle across the four available
+          sources purely for visual variety. */}
+
+      {/* ── SCROLL ZOOM → About ── */}
       <ScrollZoomSection
         mediaSrc={SHOWREEL_VIDEO}
         leftText="Kdo jsme"
@@ -338,12 +343,10 @@ export default function Index() {
       {/* ── ABOUT ── */}
       <AboutSection />
 
-      <SectionBridge />
-
       {/* ── CLIENT TRUST BAR ── */}
       <ClientLogos />
 
-      {/* ── SCROLL ZOOM 2 — přechod do Services ── */}
+      {/* ── SCROLL ZOOM → Services ── */}
       <ScrollZoomSection
         mediaSrc={SERVICES_VIDEO}
         leftText="Naše"
@@ -355,17 +358,31 @@ export default function Index() {
       {/* ── SERVICES ── */}
       <ServicesSection />
 
-      <SectionBridge />
+      {/* ── SCROLL ZOOM → Showcase ── */}
+      <ScrollZoomSection
+        mediaSrc={HERO_VIDEO}
+        leftText="Naše"
+        rightText="Práce"
+        ctaText="Prohlédnout"
+        ctaHref="#case-studies"
+      />
 
       {/* ── SHOWCASE / CASE STUDY ── */}
       <ShowcaseSection />
 
-      <SectionBridge />
+      {/* ── SCROLL ZOOM → Testimonials ── */}
+      <ScrollZoomSection
+        mediaSrc={SERVICES_VIDEO}
+        leftText="Co říkají"
+        rightText="Klienti"
+        ctaText="Reference"
+        ctaHref="#reference"
+      />
 
       {/* ── TESTIMONIALS ── */}
       <TestimonialsSection />
 
-      {/* ── SCROLL ZOOM 3 — přechod do Philosophy ── */}
+      {/* ── SCROLL ZOOM → Philosophy ── */}
       <ScrollZoomSection
         mediaSrc={PHILOSOPHY_VIDEO}
         leftText="Technologie"
@@ -377,12 +394,26 @@ export default function Index() {
       {/* ── PHILOSOPHY ── */}
       <PhilosophySection />
 
-      <SectionBridge />
+      {/* ── SCROLL ZOOM → Process ── */}
+      <ScrollZoomSection
+        mediaSrc={SHOWREEL_VIDEO}
+        leftText="Jak"
+        rightText="pracujeme"
+        ctaText="Náš proces"
+        ctaHref="#proces"
+      />
 
       {/* ── PROCESS ── */}
       <ProcessSection />
 
-      <SectionBridge />
+      {/* ── SCROLL ZOOM → Contact ── */}
+      <ScrollZoomSection
+        mediaSrc={HERO_VIDEO}
+        leftText="Pojďme do"
+        rightText="toho"
+        ctaText="Spojit se"
+        ctaHref="#contact"
+      />
 
       {/* ── CONTACT ── */}
       <ContactSection />
