@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { useReveal, useParallax } from "../hooks/useReveal";
+import { useMagnetic } from "../hooks/useMagnetic";
+import ScrambleText from "./ScrambleText";
 
 const VIDEO =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260307_083826_e938b29f-a43a-41ec-a153-3d4730578ab8.mp4";
@@ -22,6 +24,7 @@ const pillars = [
 export default function PhilosophySection() {
   const sectionRef = useReveal("-60px") as React.RefObject<HTMLElement>;
   const videoRef = useParallax(0.08) as React.RefObject<HTMLElement>;
+  const ctaMagnetic = useMagnetic(0.3);
 
   return (
     <section
@@ -37,9 +40,11 @@ export default function PhilosophySection() {
             Filosofie
           </p>
           <h2 className="text-5xl md:text-7xl lg:text-8xl tracking-tight text-white">
-            Technologie{" "}
+            <ScrambleText text="Technologie" />{" "}
             <span className="instrument italic text-white/30">×</span>{" "}
-            <span className="accent-gradient-text">Výsledky</span>
+            <span className="accent-gradient-text">
+              <ScrambleText text="Výsledky" />
+            </span>
           </h2>
         </div>
 
@@ -86,12 +91,13 @@ export default function PhilosophySection() {
             ))}
 
             <motion.a
+              ref={ctaMagnetic as React.RefObject<HTMLAnchorElement>}
+              data-cursor-hover
               href="#contact"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="mt-10 liquid-glass rounded-full px-8 py-4 text-sm w-fit flex items-center gap-3 hover:bg-white/5 transition-colors"
             >

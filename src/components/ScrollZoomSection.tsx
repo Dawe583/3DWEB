@@ -29,12 +29,12 @@ export default function ScrollZoomSection({
     offset: ["start start", "end end"],
   });
 
-  // Width: 18vw → 100vw
-  const rawWidth = useTransform(scrollYProgress, [0, 1], ["18vw", "100vw"]);
-  // Height: 7vh → 100vh
-  const rawHeight = useTransform(scrollYProgress, [0, 1], ["7vh", "100vh"]);
-  // Border radius: 40px → 0px
-  const rawRadius = useTransform(scrollYProgress, [0, 1], [40, 0]);
+  // Width: 32vw → 100vw
+  const rawWidth = useTransform(scrollYProgress, [0, 1], ["32vw", "100vw"]);
+  // Height: 16vh → 100vh
+  const rawHeight = useTransform(scrollYProgress, [0, 1], ["16vh", "100vh"]);
+  // Border radius: 32px → 0px
+  const rawRadius = useTransform(scrollYProgress, [0, 1], [32, 0]);
 
   const springConfig = { stiffness: 90, damping: 25, mass: 0.6 };
 
@@ -54,7 +54,7 @@ export default function ScrollZoomSection({
   return (
     <section
       ref={ref}
-      style={{ height: "400vh", position: "relative" }}
+      style={{ height: "250vh", position: "relative" }}
     >
       <div
         style={{

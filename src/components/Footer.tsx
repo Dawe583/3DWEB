@@ -1,4 +1,13 @@
 import { Globe } from "lucide-react";
+import { Link } from "react-router-dom";
+
+const FOOTER_LINKS = [
+  { label: "O nás", href: "#about" },
+  { label: "Služby", href: "#services" },
+  { label: "Šablony", href: "/weby" },
+  { label: "Filosofie", href: "#philosophy" },
+  { label: "Kontakt", href: "#contact" },
+];
 
 export default function Footer() {
   return (
@@ -10,15 +19,17 @@ export default function Footer() {
           <span className="font-semibold tracking-wide">SiteSpot</span>
         </div>
 
-        <nav className="flex items-center gap-8 text-sm text-white/40">
-          {["O nás", "Služby", "Filosofie", "Kontakt"].map(item => (
-            <a
-              key={item}
-              href={`#${item === "O nás" ? "about" : item === "Služby" ? "services" : item === "Filosofie" ? "philosophy" : "contact"}`}
-              className="hover:text-white transition-colors"
-            >
-              {item}
-            </a>
+        <nav className="flex items-center gap-8 text-sm text-white/40 flex-wrap justify-center">
+          {FOOTER_LINKS.map(link => (
+            link.href.startsWith("/") ? (
+              <Link key={link.label} to={link.href} className="hover:text-white transition-colors">
+                {link.label}
+              </Link>
+            ) : (
+              <a key={link.label} href={link.href} className="hover:text-white transition-colors">
+                {link.label}
+              </a>
+            )
           ))}
         </nav>
 

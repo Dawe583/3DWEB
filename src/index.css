@@ -3,7 +3,13 @@
 @import "tailwindcss";
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+}
+
+@media (pointer: fine) {
+  body, a, button {
+    cursor: none;
+  }
 }
 
 html,

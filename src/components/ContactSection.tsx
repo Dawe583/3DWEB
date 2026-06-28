@@ -1,11 +1,14 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
+import { useMagnetic } from "../hooks/useMagnetic";
+import ScrambleText from "./ScrambleText";
 
 export default function ContactSection() {
   const [sent, setSent] = useState(false);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const submitMagnetic = useMagnetic(0.3);
 
   const handleSubmit = () => {
     if (!email) return;
@@ -36,9 +39,9 @@ export default function ContactSection() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="text-5xl md:text-7xl tracking-tight text-white mb-6"
         >
-          Začněme{" "}
+          <ScrambleText text="Začněme" />{" "}
           <span className="instrument italic accent-gradient-text">
-            společně
+            <ScrambleText text="společně" />
           </span>
         </motion.h2>
 
@@ -79,7 +82,8 @@ export default function ContactSection() {
               />
             </div>
             <motion.button
-              whileHover={{ scale: 1.02 }}
+              ref={submitMagnetic as React.RefObject<HTMLButtonElement>}
+              data-cursor-hover
               whileTap={{ scale: 0.98 }}
               onClick={handleSubmit}
               className="liquid-glass rounded-2xl px-8 py-4 text-sm font-medium flex items-center justify-center gap-3 hover:bg-white/5 transition-colors"

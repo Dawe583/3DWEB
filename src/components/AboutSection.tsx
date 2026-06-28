@@ -1,4 +1,6 @@
 import { useReveal } from "../hooks/useReveal";
+import Counter from "./Counter";
+import ScrambleText from "./ScrambleText";
 
 const stats = [
   { value: "120+", label: "Webů spuštěno" },
@@ -25,12 +27,14 @@ export default function AboutSection() {
         </p>
 
         <h2 className="reveal delay-1 mt-8 text-4xl md:text-6xl lg:text-7xl leading-[1.1] tracking-tight text-white">
-          Stavíme digitální{" "}
-          <span className="instrument italic text-white/50">přítomnost</span>
+          <ScrambleText text="Stavíme digitální" />{" "}
+          <span className="instrument italic text-white/50">
+            <ScrambleText text="přítomnost" />
+          </span>
           <br className="hidden md:block" />
-          která{" "}
+          <ScrambleText text="která" />{" "}
           <span className="instrument italic accent-gradient-text">
-            prodává sama.
+            <ScrambleText text="prodává sama." />
           </span>
         </h2>
 
@@ -46,9 +50,10 @@ export default function AboutSection() {
               key={stat.label}
               className={`reveal-scale delay-${i + 2} liquid-glass rounded-2xl p-6`}
             >
-              <p className="text-3xl md:text-4xl font-light accent-gradient-text">
-                {stat.value}
-              </p>
+              <Counter
+                value={stat.value}
+                className="text-3xl md:text-4xl font-light accent-gradient-text"
+              />
               <p className="mt-2 text-xs text-white/40 uppercase tracking-[0.15em]">
                 {stat.label}
               </p>
