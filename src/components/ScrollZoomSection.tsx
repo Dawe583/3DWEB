@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useMagnetic } from "../hooks/useMagnetic";
+import HlsVideo from "./HlsVideo";
 
 interface ScrollZoomSectionProps {
   /** video or image src */
@@ -123,7 +124,8 @@ export default function ScrollZoomSection({
           }}
         >
           {mediaType === "video" ? (
-            <video
+            <HlsVideo
+              src={mediaSrc}
               style={{
                 width: "100%",
                 height: "100%",
@@ -134,10 +136,8 @@ export default function ScrollZoomSection({
               autoPlay
               loop
               playsInline
-              preload="metadata"
-            >
-              <source src={mediaSrc} />
-            </video>
+              preload="none"
+            />
           ) : (
             <img
               src={mediaSrc}

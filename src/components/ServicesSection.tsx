@@ -71,7 +71,7 @@ function ServiceCard({
         <div className="relative aspect-video md:aspect-auto md:h-[58vh] overflow-hidden">
           <video
             className="h-full w-full object-cover"
-            muted autoPlay loop playsInline preload="auto"
+            muted autoPlay loop playsInline preload="none"
           >
             <source src={service.video} />
           </video>

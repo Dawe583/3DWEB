@@ -64,7 +64,7 @@ function ProjectCard({
             autoPlay
             loop
             playsInline
-            preload="metadata"
+            preload="none"
           >
             <source src={project.video} />
           </video>

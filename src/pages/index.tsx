@@ -17,6 +17,7 @@ import ClientLogos from "../components/ClientLogos";
 import TestimonialsSection from "../components/TestimonialsSection";
 import ScrollSpyDots from "../components/ScrollSpyDots";
 import { useMagnetic } from "../hooks/useMagnetic";
+import { VIDEOS } from "../data/videos";
 
 const HERO_VIDEO =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260319_055001_8e16d972-3b2b-441c-86ad-2901a54682f9.mp4";
@@ -360,7 +361,7 @@ export default function Index() {
 
       {/* ── SCROLL ZOOM → Showcase ── */}
       <ScrollZoomSection
-        mediaSrc={HERO_VIDEO}
+        mediaSrc={VIDEOS.introShowcase}
         leftText="Naše"
         rightText="Práce"
         ctaText="Prohlédnout"
@@ -372,7 +373,7 @@ export default function Index() {
 
       {/* ── SCROLL ZOOM → Testimonials ── */}
       <ScrollZoomSection
-        mediaSrc={SERVICES_VIDEO}
+        mediaSrc={VIDEOS.introTestimonials}
         leftText="Co říkají"
         rightText="Klienti"
         ctaText="Reference"
@@ -396,7 +397,7 @@ export default function Index() {
 
       {/* ── SCROLL ZOOM → Process ── */}
       <ScrollZoomSection
-        mediaSrc={SHOWREEL_VIDEO}
+        mediaSrc={VIDEOS.introProcess}
         leftText="Jak"
         rightText="pracujeme"
         ctaText="Náš proces"
