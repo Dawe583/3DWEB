@@ -62,14 +62,15 @@ export default function ScrollZoomSection({
   );
   const skewY = useSpring(rawSkew, { stiffness: 120, damping: 20, mass: 0.3 });
 
-  // Side text fades out as video expands
-  const sideOpacity = useTransform(scrollYProgress, [0, 0.35], [1, 0]);
-  const sideX_left = useTransform(scrollYProgress, [0, 0.4], [0, -40]);
-  const sideX_right = useTransform(scrollYProgress, [0, 0.4], [0, 40]);
+  // Side text fades out as video expands — clears out before the overlay
+  // arrives, so the two never visually overlap mid-transition.
+  const sideOpacity = useTransform(scrollYProgress, [0, 0.28], [1, 0]);
+  const sideX_left = useTransform(scrollYProgress, [0, 0.3], [0, -40]);
+  const sideX_right = useTransform(scrollYProgress, [0, 0.3], [0, 40]);
 
   // Foreground title + CTA fade in over the video once it's expanded
-  const overlayOpacity = useTransform(scrollYProgress, [0.4, 0.62], [0, 1]);
-  const overlayY = useTransform(scrollYProgress, [0.4, 0.62], [30, 0]);
+  const overlayOpacity = useTransform(scrollYProgress, [0.45, 0.62], [0, 1]);
+  const overlayY = useTransform(scrollYProgress, [0.45, 0.62], [30, 0]);
 
   return (
     <section
