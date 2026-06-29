@@ -31,7 +31,7 @@ const steps = [
     icon: Rocket,
     title: "Spuštění",
     text: "Nasadíme, změříme a ladíme. Předáváme stroj, který reálně přivádí zákazníky.",
-    video: null,
+    video: VIDEOS.cardA,
   },
 ];
 
