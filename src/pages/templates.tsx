@@ -12,7 +12,7 @@ export default function Templates() {
   const ctaMagnetic = useMagnetic(0.25);
 
   return (
-    <main className="bg-black min-h-screen">
+    <main className="min-h-screen">
       <nav className="px-6 py-6 relative z-30">
         <div className="max-w-5xl mx-auto liquid-glass rounded-full px-6 py-3 flex items-center justify-between">
           <Link to="/" data-cursor-hover className="flex items-center" aria-label="Domů">

@@ -68,7 +68,7 @@ export default function TemplateDetail() {
   const heroFade = useTransform(scrollYProgress, [0, 0.8], [0.45, 0.9]);
 
   return (
-    <main className="bg-black min-h-screen">
+    <main className="min-h-screen">
       {/* ── NAV ── */}
       <nav className="px-6 py-6 relative z-20">
         <div className="max-w-5xl mx-auto liquid-glass rounded-full px-6 py-3 flex items-center justify-between">

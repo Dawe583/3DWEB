@@ -70,7 +70,6 @@ export default function ScrollZoomSection({
           justifyContent: "center",
           gap: "20px",
           overflow: "hidden",
-          background: "black",
         }}
       >
         {/* Soft glow halo behind the card so the black margins don't read as empty */}

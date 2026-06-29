@@ -45,7 +45,7 @@ function useInput() {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       scroll.current = max > 0 ? y / max : 0;
       // Accumulate a small rotational impulse proportional to scroll speed.
-      velocity.current += (y - lastY) * 0.0006;
+      velocity.current += (y - lastY) * 0.00012;
       lastY = y;
     };
     window.addEventListener("pointermove", onMove);
@@ -72,11 +72,11 @@ type CrystalSpec = {
 // Scattered toward the edges so they're visible in the margins around centred
 // content, at varied depths for parallax.
 const CRYSTALS: CrystalSpec[] = [
-  { position: [-5.4, 1.6, -3], scale: 1.1, detail: 12, speed: 1.2, distort: 0.36, floatSpeed: 1.3 },
-  { position: [5.6, -1.2, -3.5], scale: 1.3, detail: 12, speed: 1.0, distort: 0.32, floatSpeed: 1.1 },
-  { position: [3.4, 3.4, -4], scale: 0.85, detail: 8, speed: 1.5, distort: 0.42, floatSpeed: 1.7 },
-  { position: [-3.6, -3.4, -4], scale: 0.8, detail: 6, speed: 1.6, distort: 0.45, floatSpeed: 1.8 },
-  { position: [0, 0.4, -8], scale: 1.7, detail: 12, speed: 0.8, distort: 0.3, floatSpeed: 1.0 },
+  { position: [-7.2, 2.4, -6], scale: 0.65, detail: 12, speed: 1.2, distort: 0.36, floatSpeed: 1.3 },
+  { position: [7.4, -1.8, -6.5], scale: 0.75, detail: 12, speed: 1.0, distort: 0.32, floatSpeed: 1.1 },
+  { position: [4.6, 4.4, -7], scale: 0.5, detail: 8, speed: 1.5, distort: 0.42, floatSpeed: 1.7 },
+  { position: [-5, -4.4, -7], scale: 0.48, detail: 6, speed: 1.6, distort: 0.45, floatSpeed: 1.8 },
+  { position: [0, 0.4, -11], scale: 1.0, detail: 12, speed: 0.8, distort: 0.3, floatSpeed: 1.0 },
 ];
 
 function Crystal({ spec }: { spec: CrystalSpec }) {
@@ -87,8 +87,8 @@ function Crystal({ spec }: { spec: CrystalSpec }) {
   useFrame((_, delta) => {
     const g = spinRef.current;
     if (!g) return;
-    g.rotation.y += delta * spec.speed * 0.18;
-    g.rotation.x += delta * spec.speed * 0.07;
+    g.rotation.y += delta * spec.speed * 0.08;
+    g.rotation.x += delta * spec.speed * 0.03;
   });
 
   return (
@@ -98,7 +98,7 @@ function Crystal({ spec }: { spec: CrystalSpec }) {
           <MeshDistortMaterial
             color={ACCENT_A}
             emissive={ACCENT_B}
-            emissiveIntensity={0.18}
+            emissiveIntensity={0.12}
             roughness={0.2}
             metalness={0.85}
             distort={spec.distort}
@@ -125,17 +125,17 @@ function Field() {
     const group = groupRef.current;
     if (!group) return;
     // Constant drift + a decaying impulse from how fast the page is scrolling.
-    baseYaw.current += delta * 0.03 + velocity.current;
-    velocity.current = THREE.MathUtils.lerp(velocity.current, 0, 0.08);
+    baseYaw.current += delta * 0.015 + velocity.current;
+    velocity.current = THREE.MathUtils.lerp(velocity.current, 0, 0.12);
     group.rotation.y = THREE.MathUtils.lerp(
       group.rotation.y,
-      baseYaw.current + pointer.current.x * 0.35 + scroll.current * 1.4,
-      0.05
+      baseYaw.current + pointer.current.x * 0.15 + scroll.current * 0.6,
+      0.035
     );
-    group.rotation.x = THREE.MathUtils.lerp(group.rotation.x, pointer.current.y * 0.22, 0.05);
+    group.rotation.x = THREE.MathUtils.lerp(group.rotation.x, pointer.current.y * 0.1, 0.035);
     // Cursor parallax shift + a gentle sink as you scroll, deepening the depth.
-    group.position.x = THREE.MathUtils.lerp(group.position.x, pointer.current.x * 0.6, 0.05);
-    group.position.y = THREE.MathUtils.lerp(group.position.y, -pointer.current.y * 0.4 + scroll.current * 2.5, 0.05);
+    group.position.x = THREE.MathUtils.lerp(group.position.x, pointer.current.x * 0.3, 0.035);
+    group.position.y = THREE.MathUtils.lerp(group.position.y, -pointer.current.y * 0.2 + scroll.current * 1.2, 0.035);
   });
 
   return (
@@ -178,7 +178,7 @@ export default function Scene3DBackground() {
     <motion.div
       aria-hidden
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      animate={{ opacity: 0.55 }}
       transition={{ duration: 1.6, delay: 0.3 }}
       style={{ position: "fixed", inset: 0, zIndex: 1, pointerEvents: "none" }}
     >
