@@ -1,25 +1,9 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { MeshDistortMaterial, Float, Icosahedron } from "@react-three/drei";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import * as THREE from "three";
-
-// Skips the WebGL canvas on small/touch screens — it's ambient decoration, not
-// core content, and isn't worth the GPU/battery cost on mobile.
-function useCanRender3D() {
-  const [canRender, setCanRender] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches
-  );
-
-  useEffect(() => {
-    const query = window.matchMedia("(min-width: 768px)");
-    const onChange = (e: MediaQueryListEvent) => setCanRender(e.matches);
-    query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
-  }, []);
-
-  return canRender;
-}
+import { useIsDesktop } from "../hooks/useIsDesktop";
 
 const ACCENT_A = "#818cf8"; // indigo
 const ACCENT_B = "#c084fc"; // purple
@@ -166,7 +150,7 @@ function SceneLights() {
  * cursor and scroll position. Replaces nothing structural — purely additive depth.
  */
 export default function Scene3DBackground() {
-  const canRender = useCanRender3D();
+  const canRender = useIsDesktop();
   const dpr = useMemo<[number, number]>(() => [1, 1.6], []);
 
   // On mobile the canvas is skipped entirely (perf). On desktop it always runs
