@@ -95,7 +95,7 @@ export default function TemplateDetail() {
               loop
               muted
               playsInline
-              preload="none"
+              preload="metadata"
               className="absolute inset-0 w-full h-full object-cover"
             />
           </motion.div>

@@ -18,7 +18,7 @@ export default function FeaturedVideoSection() {
         <div className="reveal-scale overflow-hidden rounded-3xl aspect-video relative">
           <video
             className="w-full h-full object-cover"
-            muted autoPlay loop playsInline preload="none"
+            muted autoPlay loop playsInline preload="metadata"
           >
             <source src={VIDEO} />
           </video>

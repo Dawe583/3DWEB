@@ -296,7 +296,7 @@ export default function TemplateCarousel({ templates }: TemplateCarouselProps) {
                           loop
                           muted
                           playsInline
-                          preload="none"
+                          preload="metadata"
                           className="absolute inset-0 w-full h-full object-cover rounded-[16px]"
                         />
                         <div className="absolute inset-0 p-5 sm:p-6 text-white h-full w-full font-sans z-10 bg-black/20">
@@ -339,7 +339,7 @@ export default function TemplateCarousel({ templates }: TemplateCarouselProps) {
                       }}
                     >
                       <div className="absolute inset-0 pointer-events-none" style={{ filter: "blur(16px)", transform: "scale(1.15)" }}>
-                        <video src={tpl.video} autoPlay loop muted playsInline preload="none" className="absolute inset-0 w-full h-full object-cover" />
+                        <video src={tpl.video} autoPlay loop muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover" />
                       </div>
                       <div className="absolute inset-0 bg-black/40" />
                       <div className="absolute left-0 right-0 top-4 sm:top-5 h-7 sm:h-9 bg-black/85 backdrop-blur-md z-10" />

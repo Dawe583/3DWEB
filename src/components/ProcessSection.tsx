@@ -66,7 +66,7 @@ export default function ProcessSection() {
                       <HlsVideo
                         src={step.video}
                         className="h-full w-full object-cover"
-                        muted autoPlay loop playsInline preload="none"
+                        muted autoPlay loop playsInline preload="metadata"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                       <div className="absolute top-4 left-4 liquid-glass rounded-2xl w-11 h-11 flex items-center justify-center">

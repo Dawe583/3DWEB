@@ -1,78 +1,73 @@
 import { useEffect } from "react";
 
-// Browsers cap how many <video autoPlay> elements can actually decode at
-// once. With this many video sections on the page, autoplaying all of them
-// on load makes most silently fail to start. Instead, only play videos that
-// are actually on screen and pause the rest.
+// Browsers cap how many <video> elements can actually decode at once, so we
+// can't just autoplay every video on the page — most would silently fail to
+// start. The rule here: a video plays only while it's actually on screen, and
+// is paused otherwise.
 //
-// A single play() call on enter-viewport isn't enough: if the video hasn't
-// buffered enough data yet, the browser rejects that call and nothing
-// retries it, leaving the video frozen on its first frame ("looks like a
-// static image"). So every video that's currently meant to be playing is
-// retried on 'canplay'/'loadeddata', and again whenever the tab regains
-// visibility (backgrounding a tab can silently drop playback).
+// This used to be driven by an IntersectionObserver, but the observer proved
+// unreliable on this page — cards inside horizontally-translated / 3D-tilted
+// tracks (the Services carousel) never got flagged as intersecting even when
+// plainly visible, so they sat frozen on their first frame. So instead we ask
+// each video where it actually is via getBoundingClientRect. One controller,
+// no fragile heuristics, no fighting between two mechanisms.
+//
+// `sync()` runs on every scroll (rAF-throttled), when the tab becomes visible
+// again (backgrounding can drop playback), and on a steady interval as a
+// backstop — the interval also retries any play() that was rejected because
+// the video hadn't buffered yet (the reject is swallowed and simply retried
+// next tick).
 export default function VideoManager() {
   useEffect(() => {
-    const shouldPlay = new WeakSet<HTMLVideoElement>();
-
-    const tryPlay = (video: HTMLVideoElement) => {
-      if (shouldPlay.has(video) && video.paused) {
-        video.play().catch(() => {});
-      }
-    };
-
-    const onCanPlay = (e: Event) => tryPlay(e.target as HTMLVideoElement);
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const video = entry.target as HTMLVideoElement;
-          if (entry.isIntersecting) {
-            shouldPlay.add(video);
-            tryPlay(video);
-          } else {
-            shouldPlay.delete(video);
-            video.pause();
+    const sync = () => {
+      const vh = window.innerHeight;
+      const vw = window.innerWidth;
+      document.querySelectorAll("video").forEach((el) => {
+        const video = el as HTMLVideoElement;
+        const r = video.getBoundingClientRect();
+        const onScreen = r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw;
+        if (onScreen) {
+          if (video.paused) {
+            // Re-assert muted/playsInline before playing: React sets `muted` as
+            // an attribute that doesn't always sync to the DOM property, and a
+            // non-muted video has its autoplay blocked by the browser.
+            video.muted = true;
+            video.playsInline = true;
+            video.play().catch(() => {});
           }
+        } else if (!video.paused) {
+          video.pause();
         }
-      },
-      { threshold: 0.1, rootMargin: "200px 0px" },
-    );
-
-    const watched = new WeakSet<HTMLVideoElement>();
-    const observeAll = () => {
-      document.querySelectorAll("video").forEach((video) => {
-        if (watched.has(video as HTMLVideoElement)) return;
-        watched.add(video as HTMLVideoElement);
-        observer.observe(video);
-        video.addEventListener("canplay", onCanPlay);
-        video.addEventListener("loadeddata", onCanPlay);
       });
     };
 
-    observeAll();
-
-    // New videos can mount later (route changes, lazy sections), so keep
-    // watching the DOM for additions.
-    const mutationObserver = new MutationObserver(observeAll);
-    mutationObserver.observe(document.body, { childList: true, subtree: true });
-
-    // A backgrounded tab can pause/drop video decoding outside our control —
-    // re-assert playback for everything currently flagged as on-screen.
-    const onVisibilityChange = () => {
-      if (document.visibilityState !== "visible") return;
-      document.querySelectorAll("video").forEach((video) => tryPlay(video as HTMLVideoElement));
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        sync();
+        ticking = false;
+      });
     };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") sync();
+    };
+
+    sync();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
     document.addEventListener("visibilitychange", onVisibilityChange);
+    // Backstop for videos that mount late (route changes, lazy sections) and
+    // for play() calls rejected before the video had buffered.
+    const interval = window.setInterval(sync, 800);
 
     return () => {
-      observer.disconnect();
-      mutationObserver.disconnect();
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      document.querySelectorAll("video").forEach((video) => {
-        video.removeEventListener("canplay", onCanPlay);
-        video.removeEventListener("loadeddata", onCanPlay);
-      });
+      window.clearInterval(interval);
     };
   }, []);
 

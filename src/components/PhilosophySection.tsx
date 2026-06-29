@@ -57,7 +57,7 @@ export default function PhilosophySection() {
           >
             <video
               className="w-full h-full object-cover"
-              muted autoPlay loop playsInline preload="none"
+              muted autoPlay loop playsInline preload="metadata"
             >
               <source src={VIDEO} />
             </video>

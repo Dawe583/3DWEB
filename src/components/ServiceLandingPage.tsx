@@ -119,7 +119,7 @@ export default function ServiceLandingPage({
             autoPlay
             loop
             playsInline
-            preload="none"
+            preload="metadata"
           >
             <source src={heroVideo} />
           </video>

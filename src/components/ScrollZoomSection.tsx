@@ -154,7 +154,7 @@ export default function ScrollZoomSection({
               autoPlay
               loop
               playsInline
-              preload="none"
+              preload="metadata"
             />
           ) : (
             <img
