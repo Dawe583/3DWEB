@@ -126,7 +126,7 @@ export default function Index() {
       <ScrollSpyDots />
 
       {/* ── HERO ── */}
-      <section ref={heroRef} style={{ height: "250vh", position: "relative" }}>
+      <section ref={heroRef} className="h-[180vh] md:h-[250vh]" style={{ position: "relative" }}>
         <div
           style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}
           className="flex flex-col"

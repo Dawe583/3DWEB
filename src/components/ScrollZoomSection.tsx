@@ -75,7 +75,8 @@ export default function ScrollZoomSection({
   return (
     <section
       ref={ref}
-      style={{ height: "250vh", position: "relative" }}
+      className="h-[180vh] md:h-[250vh]"
+      style={{ position: "relative" }}
     >
       <div
         style={{

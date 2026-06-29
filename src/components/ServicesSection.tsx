@@ -7,6 +7,7 @@ import ScrambleText from "./ScrambleText";
 import SectionHeading from "./SectionHeading";
 import { useMagnetic } from "../hooks/useMagnetic";
 import { useTilt } from "../hooks/useTilt";
+import { useIsDesktop } from "../hooks/useIsDesktop";
 
 const services = [
   {
@@ -128,6 +129,7 @@ export default function ServicesSection() {
   const nextMagnetic = useMagnetic(0.3);
   const [activeIndex, setActiveIndex] = useState(0);
   const [maxScroll, setMaxScroll] = useState(0);
+  const isDesktop = useIsDesktop();
 
   // The section is pinned while you scroll past it and the cards translate
   // horizontally in lock-step — so plain vertical scrolling walks through every
@@ -170,7 +172,7 @@ export default function ServicesSection() {
       id="services"
       ref={sectionRef}
       className="relative"
-      style={{ height: `${services.length * 100}vh` }}
+      style={{ height: `${services.length * (isDesktop ? 100 : 70)}vh` }}
     >
       <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
 
