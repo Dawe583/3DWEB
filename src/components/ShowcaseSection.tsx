@@ -15,8 +15,7 @@ const projects = [
       "Rezervační web s online menu a AI chatbotem pro objednávky. Konverze rezervací +64 % za první měsíc.",
     metric: "+64 %",
     metricLabel: "konverze rezervací",
-    video:
-      "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_131748_f2ca2a28-fed7-44c8-b9a9-bd9acdd5ec31.mp4",
+    video: "/videos/showcase-restaurant.mp4",
   },
   {
     name: "Forma Studio",
@@ -25,8 +24,7 @@ const projects = [
       "Landing page + lead-gen kampaň pro fitness studio. 230 nových leadů během 6 týdnů od spuštění.",
     metric: "230",
     metricLabel: "nových leadů",
-    video:
-      "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260324_151826_c7218672-6e92-402c-9e45-f1e0f454bdc4.mp4",
+    video: "/videos/showcase-fitness.mp4",
   },
   {
     name: "Nova Shop",
@@ -35,8 +33,7 @@ const projects = [
       "Kompletní e-commerce platforma s AI doporučováním produktů a automatizovaným retargetingem. Tržby +2,4×.",
     metric: "2,4×",
     metricLabel: "růst tržeb",
-    video:
-      "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260402_054547_9875cfc5-155a-4229-8ec8-b7ba7125cbf8.mp4",
+    video: "/videos/showcase-eshop.mp4",
   },
 ];
 
