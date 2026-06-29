@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { MessageSquare, PenTool, Code2, Rocket } from "lucide-react";
+import { DUR, EASE_OUT, inViewOnce } from "../lib/motion";
 import ScrambleText from "./ScrambleText";
 import SectionHeading from "./SectionHeading";
 import SpotlightCard from "./SpotlightCard";
@@ -55,8 +56,8 @@ export default function ProcessSection() {
                 key={step.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.6, delay: i * 0.12 }}
+                viewport={inViewOnce}
+                transition={{ duration: DUR.base, ease: EASE_OUT, delay: i * 0.12 }}
                 className="relative"
               >
                 <SpotlightCard className="liquid-glass rounded-3xl overflow-hidden h-full flex flex-col">

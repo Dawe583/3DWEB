@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { DUR, EASE_OUT, inViewOnce } from "../lib/motion";
 import { useTilt } from "../hooks/useTilt";
 import ScrambleText from "./ScrambleText";
 import SectionHeading from "./SectionHeading";
@@ -53,8 +54,8 @@ function ProjectCard({
       ref={tilt}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
+      viewport={inViewOnce}
+      transition={{ duration: DUR.base, ease: EASE_OUT, delay: index * 0.1 }}
     >
       <SpotlightCard className="liquid-glass rounded-3xl overflow-hidden group flex flex-col">
         <div className="relative aspect-[4/3] overflow-hidden">

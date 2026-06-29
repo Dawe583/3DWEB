@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
+import { DUR, EASE_OUT, inViewOnce } from "../lib/motion";
 import { useTilt } from "../hooks/useTilt";
 import ScrambleText from "./ScrambleText";
 import SectionHeading from "./SectionHeading";
@@ -36,8 +37,8 @@ function TestimonialCard({
       ref={tilt}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, delay: index * 0.12 }}
+      viewport={inViewOnce}
+      transition={{ duration: DUR.base, ease: EASE_OUT, delay: index * 0.12 }}
     >
       <SpotlightCard className="liquid-glass rounded-3xl p-8 md:p-10 flex flex-col h-full">
         <Quote className="w-8 h-8 text-indigo-300/60 mb-6" />

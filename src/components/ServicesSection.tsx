@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform, useSpring, useMotionValueEvent } from "framer-motion";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Globe, Bot, Target, Megaphone } from "lucide-react";
+import { DUR } from "../lib/motion";
 import ScrambleText from "./ScrambleText";
 import SectionHeading from "./SectionHeading";
 import { useMagnetic } from "../hooks/useMagnetic";
@@ -65,7 +66,7 @@ function ServiceCard({
     <div ref={tilt} className="shrink-0 w-[85vw] md:w-[60vw] lg:w-[50vw]">
       <motion.div
         animate={{ opacity: active ? 1 : 0.4, scale: active ? 1 : 0.92 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: DUR.fast }}
         className="liquid-glass overflow-hidden rounded-3xl md:grid md:grid-cols-2"
       >
         <div className="relative aspect-video md:aspect-auto md:h-[58vh] overflow-hidden">

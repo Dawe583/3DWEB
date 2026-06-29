@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { DUR, EASE_OUT, inViewOnce } from "../lib/motion";
 import { useMagnetic } from "../hooks/useMagnetic";
 import ScrambleText from "./ScrambleText";
 import SectionHeading from "./SectionHeading";
@@ -56,8 +57,8 @@ export default function ContactSection() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.3 }}
+            viewport={inViewOnce}
+            transition={{ duration: DUR.base, ease: EASE_OUT, delay: 0.3 }}
             className="max-w-lg mx-auto"
           >
             <SpotlightCard className="liquid-glass rounded-3xl p-6 md:p-8">
@@ -122,7 +123,7 @@ export default function ContactSection() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: DUR.fast, ease: EASE_OUT }}
             className="liquid-glass rounded-3xl p-10 max-w-lg mx-auto"
           >
             <p className="text-2xl text-white mb-3">✓ Odesláno</p>
@@ -135,8 +136,8 @@ export default function ContactSection() {
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          viewport={inViewOnce}
+          transition={{ duration: DUR.base, ease: EASE_OUT, delay: 0.5 }}
           className="mt-8 text-sm text-white/30"
         >
           Nebo napište přímo na{" "}
