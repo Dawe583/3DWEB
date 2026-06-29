@@ -37,6 +37,33 @@ const STATS = [
   { value: "90%", label: "dotazů bez zásahu člověka" },
 ];
 
+const CHART = {
+  title: "Kde se čas vrací",
+  unit: "h / týden",
+  bars: [
+    { label: "Zpracování dotazů", value: 6 },
+    { label: "Reporting a přehledy", value: 3 },
+    { label: "Follow-up e-maily", value: 4 },
+    { label: "Přepis dat mezi nástroji", value: 5 },
+  ],
+  ring: { percent: 90, label: "dotazů vyřízeno bez zásahu člověka" },
+};
+
+const PROCESS = [
+  {
+    title: "Audit procesů",
+    text: "Zmapujeme, kde se ztrácí čas a kde se data ručně přepisují mezi nástroji.",
+  },
+  {
+    title: "Návrh automatizace",
+    text: "Navrhneme workflows a AI kroky na míru vašemu CRM, e-mailu a formulářům.",
+  },
+  {
+    title: "Nasazení a ladění",
+    text: "Spustíme, měříme výsledky a postupně rozšiřujeme rozsah automatizace.",
+  },
+];
+
 export default function Automatizace() {
   return (
     <ServiceLandingPage
@@ -47,6 +74,8 @@ export default function Automatizace() {
       heroVideo={HERO_VIDEO}
       features={FEATURES}
       stats={STATS}
+      chart={CHART}
+      process={PROCESS}
       ctaLabel="Automatizovat můj byznys"
     />
   );

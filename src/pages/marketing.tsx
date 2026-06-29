@@ -37,6 +37,33 @@ const STATS = [
   { value: "6", label: "týdnů do prvních výsledků" },
 ];
 
+const CHART = {
+  title: "Růst leadů v čase",
+  unit: "leadů / měs.",
+  bars: [
+    { label: "Měsíc 1", value: 18 },
+    { label: "Měsíc 2", value: 34 },
+    { label: "Měsíc 3", value: 52 },
+    { label: "Měsíc 4", value: 71 },
+  ],
+  ring: { percent: 38, label: "nižší cena za akvizici zákazníka" },
+};
+
+const PROCESS = [
+  {
+    title: "Strategie a cílení",
+    text: "Určíme publikum, kanály a sdělení podle toho, kdo u vás reálně nakupuje.",
+  },
+  {
+    title: "Kampaně a obsah",
+    text: "Spustíme reklamy a obsah zaměřené na akci a konverzi, ne jen na dosah.",
+  },
+  {
+    title: "Měření a optimalizace",
+    text: "Každý týden ladíme podle dat — rozpočet jde tam, kde se měřitelně vrací.",
+  },
+];
+
 export default function Marketing() {
   return (
     <ServiceLandingPage
@@ -47,6 +74,8 @@ export default function Marketing() {
       heroVideo={HERO_VIDEO}
       features={FEATURES}
       stats={STATS}
+      chart={CHART}
+      process={PROCESS}
       ctaLabel="Nastartovat marketing"
     />
   );

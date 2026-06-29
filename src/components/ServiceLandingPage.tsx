@@ -8,6 +8,7 @@ import SpotlightCard from "./SpotlightCard";
 import VelocityMarquee from "./VelocityMarquee";
 import Counter from "./Counter";
 import Footer from "./Footer";
+import ScrollZoomSection from "./ScrollZoomSection";
 import { useMagnetic } from "../hooks/useMagnetic";
 import { useReveal } from "../hooks/useReveal";
 import { useTilt } from "../hooks/useTilt";
@@ -23,6 +24,18 @@ export type ServiceStat = {
   label: string;
 };
 
+export type ServiceChart = {
+  title: string;
+  unit: string;
+  bars: { label: string; value: number }[];
+  ring: { percent: number; label: string };
+};
+
+export type ServiceProcessStep = {
+  title: string;
+  text: string;
+};
+
 type ServiceLandingPageProps = {
   eyebrow: string;
   title: string;
@@ -32,6 +45,8 @@ type ServiceLandingPageProps = {
   features: ServiceFeature[];
   stats: ServiceStat[];
   ctaLabel: string;
+  chart?: ServiceChart;
+  process?: ServiceProcessStep[];
 };
 
 function FeatureCard({ feature, index }: { feature: ServiceFeature; index: number }) {
@@ -62,6 +77,78 @@ function FeatureCard({ feature, index }: { feature: ServiceFeature; index: numbe
   );
 }
 
+/** Horizontal bars — pure CSS, no chart library. Each bar is sized to its
+ *  share of the largest value. Rendered statically so it's always visible;
+ *  the entrance fade is handled by the `.reveal` wrapper around the card,
+ *  which is reduced-motion-safe (see index.css). The fill keeps a CSS
+ *  transition so it still eases in for users who allow motion. */
+function BarChart({ chart }: { chart: ServiceChart }) {
+  const max = Math.max(...chart.bars.map((b) => b.value));
+  return (
+    <div>
+      <h3 className="text-xl tracking-tight text-white mb-6">{chart.title}</h3>
+      <div className="flex flex-col gap-4">
+        {chart.bars.map((b) => (
+          <div key={b.label}>
+            <div className="flex justify-between text-sm mb-1.5">
+              <span className="text-white/70">{b.label}</span>
+              <span className="text-white/40 tabular-nums">
+                {b.value} {chart.unit}
+              </span>
+            </div>
+            <div className="h-2.5 rounded-full bg-white/[0.06] overflow-hidden">
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: `${(b.value / max) * 100}%`,
+                  background: "linear-gradient(90deg, var(--accent-1), var(--accent-2))",
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** SVG ring filled to a percentage. Static (always visible); revealed by the
+ *  `.reveal` wrapper around the card. */
+function StatRing({ percent, label }: { percent: number; label: string }) {
+  const r = 52;
+  const circumference = 2 * Math.PI * r;
+  return (
+    <div className="flex flex-col items-center text-center">
+      <div className="relative">
+        <svg viewBox="0 0 120 120" className="w-40 h-40 -rotate-90">
+          <circle cx="60" cy="60" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="10" />
+          <circle
+            cx="60"
+            cy="60"
+            r={r}
+            fill="none"
+            stroke="url(#ringGrad)"
+            strokeWidth="10"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference * (1 - percent / 100)}
+          />
+          <defs>
+            <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="var(--accent-1)" />
+              <stop offset="100%" stopColor="var(--accent-2)" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-4xl font-light accent-gradient-text">{percent}%</span>
+        </div>
+      </div>
+      <p className="mt-3 text-sm text-white/50 max-w-[12rem]">{label}</p>
+    </div>
+  );
+}
+
 export default function ServiceLandingPage({
   eyebrow,
   title,
@@ -71,12 +158,16 @@ export default function ServiceLandingPage({
   features,
   stats,
   ctaLabel,
+  chart,
+  process,
 }: ServiceLandingPageProps) {
   const heroCta = useMagnetic(0.25);
   const navCta = useMagnetic(0.25);
   const ctaGlow = useMagnetic(0.15);
   const revealRef = useReveal();
   const statsRevealRef = useReveal();
+  const resultsRef = useReveal();
+  const processRef = useReveal();
 
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: heroProgress } = useScroll({
@@ -183,6 +274,56 @@ export default function ServiceLandingPage({
           ))}
         </div>
       </section>
+
+      {/* ── SCROLL-ZOOM EFFECT — same signature transition as the homepage ── */}
+      <ScrollZoomSection
+        mediaSrc={heroVideo}
+        leftText={title}
+        rightText={titleAccent}
+        ctaText={ctaLabel}
+        ctaHref="/#contact"
+      />
+
+      {/* ── RESULTS — lightweight static charts (no chart library), faded in
+          via the reduced-motion-safe .reveal mechanism ── */}
+      {chart && (
+        <section ref={resultsRef as React.RefObject<HTMLElement>} className="px-6 py-24 md:py-28">
+          <div className="max-w-6xl mx-auto">
+            <p className="eyebrow mb-10">Výsledky</p>
+            <div className="reveal liquid-glass rounded-3xl p-8 md:p-12 grid md:grid-cols-[1.5fr_1fr] gap-12 md:gap-16 items-center">
+              <BarChart chart={chart} />
+              <StatRing percent={chart.ring.percent} label={chart.ring.label} />
+            </div>
+            <p className="mt-6 text-xs text-white/30 text-center md:text-right">
+              Ilustrativní hodnoty na základě typických projektů.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* ── HOW IT WORKS ── */}
+      {process && (
+        <section ref={processRef as React.RefObject<HTMLElement>} className="px-6 pb-24 md:pb-32">
+          <div className="max-w-6xl mx-auto">
+            <p className="eyebrow mb-10">Jak to funguje</p>
+            <div className="grid md:grid-cols-3 gap-6">
+              {process.map((step, i) => (
+                <div
+                  key={step.title}
+                  className="reveal-scale liquid-glass rounded-3xl p-8"
+                  style={{ transitionDelay: `${i * 90}ms` }}
+                >
+                  <span className="instrument italic text-3xl accent-gradient-text leading-none">
+                    0{i + 1}
+                  </span>
+                  <h3 className="text-xl tracking-tight text-white mt-4 mb-3">{step.title}</h3>
+                  <p className="body-text text-sm">{step.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── CTA BAND ── */}
       <section className="px-6 pb-24 md:pb-32">
