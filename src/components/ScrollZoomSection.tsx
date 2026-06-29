@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useVelocity } from "framer-motion";
 import { useMagnetic } from "../hooks/useMagnetic";
 import HlsVideo from "./HlsVideo";
 
@@ -46,6 +46,21 @@ export default function ScrollZoomSection({
   const width = useSpring(rawWidth, springConfig);
   const height = useSpring(rawHeight, springConfig);
   const borderRadius = useSpring(rawRadius, { stiffness: 90, damping: 25 });
+
+  // Scroll-velocity kick: a fast flick skews the card briefly, settling back to
+  // flat as the scroll slows — reads as "this thing has mass" without a new
+  // dependency (useVelocity is built into Framer Motion).
+  // ponytail: input range [-3, 3] is a tuned-by-feel guess at "fast scroll" in
+  // progress-units/sec for a 250vh section; revisit if section height changes.
+  const prefersReducedMotion =
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const scrollVelocity = useVelocity(scrollYProgress);
+  const rawSkew = useTransform(
+    scrollVelocity,
+    [-3, 0, 3],
+    prefersReducedMotion ? [0, 0, 0] : [5, 0, -5]
+  );
+  const skewY = useSpring(rawSkew, { stiffness: 120, damping: 20, mass: 0.3 });
 
   // Side text fades out as video expands
   const sideOpacity = useTransform(scrollYProgress, [0, 0.35], [1, 0]);
@@ -117,6 +132,7 @@ export default function ScrollZoomSection({
             width,
             height,
             borderRadius,
+            skewY,
             overflow: "hidden",
             position: "relative",
             flexShrink: 0,
